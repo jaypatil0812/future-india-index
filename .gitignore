@@ -1,0 +1,23 @@
+# Ignore Python virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# SQLite database (this is generated at runtime)
+*.db
+
+# Node modules
+node_modules/
+
+# Build artifacts
+build/
+dist/
+
+# Vercel
+.vercel/
+
+# OS files
+.DS_Store
+Thumbs.db
