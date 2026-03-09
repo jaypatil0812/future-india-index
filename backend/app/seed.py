@@ -1,11 +1,4 @@
-import os
 from app.models import SessionLocal, Base, engine, Company, CompanyMetrics
-
-# Drop existing tables and recreate them to apply schema changes
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
-db = SessionLocal()
 
 india_companies = [
     # AI & Cloud (25%)
@@ -45,31 +38,48 @@ india_companies = [
     {"name": "Data Patterns", "symbol": "DATAPATTNS.NS", "sector": "Defense", "metrics": {"revenue_cagr": 35.0, "pat_cagr": 42.0, "roe": 20.0, "roce": 25.0, "operating_margin": 32.0, "debt_to_equity": 0.1, "interest_coverage": 25.0, "current_ratio": 2.8, "rd_percent": 10.0, "product_pipeline_score": 25, "market_cap_crs": 15000}}
 ]
 
-for c_data in india_companies:
-    # Add Company
-    comp = Company(name=c_data["name"], symbol=c_data["symbol"], sector=c_data["sector"])
-    db.add(comp)
-    db.commit()
-    db.refresh(comp)
-    
-    # Add Metrics
-    m = c_data["metrics"]
-    metrics = CompanyMetrics(
-        company_id=comp.id,
-        revenue_cagr=m["revenue_cagr"],
-        pat_cagr=m["pat_cagr"],
-        roe=m["roe"],
-        roce=m["roce"],
-        operating_margin=m["operating_margin"],
-        debt_to_equity=m["debt_to_equity"],
-        interest_coverage=m["interest_coverage"],
-        current_ratio=m["current_ratio"],
-        rd_percent=m["rd_percent"],
-        product_pipeline_score=m["product_pipeline_score"],
-        market_cap_crs=m["market_cap_crs"]
-    )
-    db.add(metrics)
+def seed_db():
+    """Seed the database with Future India Index companies and their metrics."""
+    db = SessionLocal()
+    try:
+        for c_data in india_companies:
+            # Check if already exists
+            existing = db.query(Company).filter(Company.symbol == c_data["symbol"]).first()
+            if existing:
+                continue
+                
+            comp = Company(name=c_data["name"], symbol=c_data["symbol"], sector=c_data["sector"])
+            db.add(comp)
+            db.commit()
+            db.refresh(comp)
 
-db.commit()
-db.close()
-print("Future India Index seed data (Companies & Metrics) added successfully!")
+            m = c_data["metrics"]
+            metrics = CompanyMetrics(
+                company_id=comp.id,
+                revenue_cagr=m["revenue_cagr"],
+                pat_cagr=m["pat_cagr"],
+                roe=m["roe"],
+                roce=m["roce"],
+                operating_margin=m["operating_margin"],
+                debt_to_equity=m["debt_to_equity"],
+                interest_coverage=m["interest_coverage"],
+                current_ratio=m["current_ratio"],
+                rd_percent=m["rd_percent"],
+                product_pipeline_score=m["product_pipeline_score"],
+                market_cap_crs=m["market_cap_crs"]
+            )
+            db.add(metrics)
+
+        db.commit()
+        print("Future India Index seed data added successfully!")
+    except Exception as e:
+        db.rollback()
+        print(f"Seed error: {e}")
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    # Allow running directly: python -m app.seed
+    Base.metadata.create_all(bind=engine)
+    seed_db()

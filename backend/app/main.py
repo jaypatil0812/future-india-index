@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.database import Base, engine, SessionLocal
+
+# ✅ Import Base and engine from models.py (NOT database.py) so all tables are registered
+from app.models import Base, engine, SessionLocal, Company
 from app.routes import stocks, companies, index
 import sys
 import os
@@ -13,13 +15,36 @@ from app.services.index_cacher import update_index_cache
 # Initialise Background Scheduler
 scheduler = BackgroundScheduler()
 
+# ✅ Create all tables (Company, CompanyMetrics, StockPrice, CachedIndex)
+Base.metadata.create_all(bind=engine)
+
+# ✅ Auto-seed if the database is empty
+def auto_seed():
+    db = SessionLocal()
+    try:
+        count = db.query(Company).count()
+        if count == 0:
+            print("Database is empty on Render. Running seed script...")
+            from app.seed import seed_db
+            seed_db()
+            print("Seed complete!")
+        else:
+            print(f"Database already has {count} companies. Skipping seed.")
+    except Exception as e:
+        print(f"Auto-seed error: {e}")
+    finally:
+        db.close()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Run once on startup to warm the cache
+    # 1. Seed database if empty
+    auto_seed()
+    
+    # 2. Start background scheduler for hourly data updates
     scheduler.add_job(update_index_cache, 'interval', hours=1)
     scheduler.start()
     
-    # Run an immediate manual fetch
+    # 3. Warm the cache immediately at startup
     print("Warming background index cache...")
     try:
         update_index_cache()
@@ -32,27 +57,23 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
 
 
-# Create tables if not exist
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="Stock Market Dashboard", lifespan=lifespan)
 
 # ✅ Enable CORS
 origins = [
-    "http://localhost:3000",   # frontend react
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://stock-market-dashboard-tan.vercel.app",
     "https://frontend-gamma-dun-15.vercel.app",
-    "https://4c4e77aab54dee60-160-20-123-9.serveousercontent.com",
     "*"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,          # frontend allowed
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],            # allow all methods (GET, POST etc.)
-    allow_headers=["*"],            # allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Attach routers
