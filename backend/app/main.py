@@ -3,8 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# ✅ Import Base and engine from models.py (NOT database.py) so all tables are registered
-from app.models import Base, engine, SessionLocal, Company
+# ✅ Import the unified Base/engine from database.py
+from app.database import Base, engine, SessionLocal
+# ✅ Import models so all tables are registered on Base
+from app import models
+from app.models import Company
 from app.routes import stocks, companies, index
 import sys
 import os

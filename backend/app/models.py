@@ -1,12 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
 
-Base = declarative_base()
-engine = create_engine("sqlite:///stocks.db")
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# ✅ Import the single shared Base, engine, SessionLocal from database.py
+from app.database import Base, engine, SessionLocal
 
 class Company(Base):
     __tablename__ = "companies"
