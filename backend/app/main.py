@@ -60,7 +60,7 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
 
 
-app = FastAPI(title="Stock Market Dashboard", lifespan=lifespan, redirect_slashes=False)
+app = FastAPI(title="Stock Market Dashboard", lifespan=lifespan)
 
 # ✅ Enable CORS
 origins = [

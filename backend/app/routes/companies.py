@@ -15,7 +15,6 @@ SECTOR_ALLOCATIONS = {
     "Defense": 0.08
 }
 
-@router.get("")
 @router.get("/")
 def get_companies(db: Session = Depends(get_db)):
     try:
