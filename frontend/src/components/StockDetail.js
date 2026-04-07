@@ -7,14 +7,13 @@ function StockDetail({ companySymbol, companyData, allCompanies }) {
     const [days, setDays] = useState(30);
     const [loading, setLoading] = useState(false);
 
+    const [companyInfo, setCompanyInfo] = useState(null);
+    const [infoLoading, setInfoLoading] = useState(false);
+
     useEffect(() => {
         if (companySymbol) {
             setLoading(true);
-            axios.get(`${process.env.REACT_APP_API_URL}/stocks/company/${companySymbol}?days=${days}`, {
-                headers: {
-                    'Bypass-Tunnel-Reminder': 'true'
-                }
-            })
+            axios.get(`${process.env.REACT_APP_API_URL}/stocks/company/${companySymbol}?days=${days}`)
                 .then((res) => {
                     console.log("Stock details response:", res.data);
                     if (!res.data.error && Array.isArray(res.data) && res.data.length > 0) {
@@ -28,6 +27,22 @@ function StockDetail({ companySymbol, companyData, allCompanies }) {
                     setStockData([]);
                 })
                 .finally(() => setLoading(false));
+                
+            // Fetch company brief info
+            setInfoLoading(true);
+            axios.get(`${process.env.REACT_APP_API_URL}/stocks/company/${companySymbol}/info`)
+                .then((res) => {
+                    if (res.data && res.data.summary) {
+                        setCompanyInfo(res.data);
+                    } else {
+                        setCompanyInfo(null);
+                    }
+                })
+                .catch((err) => {
+                    console.error("Company info fetch error:", err);
+                    setCompanyInfo(null);
+                })
+                .finally(() => setInfoLoading(false));
         }
     }, [companySymbol, days]);
 
@@ -75,7 +90,7 @@ function StockDetail({ companySymbol, companyData, allCompanies }) {
                     flexDirection: "column",
                     alignItems: "center"
                 }}>
-                    <div style={{ fontSize: "14px", opacity: 0.9, fontWeight: "600" }}>FUTURE INDIA SCORE</div>
+                    <div style={{ fontSize: "14px", opacity: 0.9, fontWeight: "600" }}>ISTE SCORE</div>
                     <div style={{ fontSize: "42px", fontWeight: "bold", lineHeight: 1 }}>
                         {score.total_score}
                     </div>
@@ -85,24 +100,50 @@ function StockDetail({ companySymbol, companyData, allCompanies }) {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "32px" }}>
 
-                {/* Scoring Engine Breakdown */}
-                <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb" }}>
-                    <h2 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "20px", color: "#111827", display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span>🎯</span> Engine Component Breakdown
-                    </h2>
+                {/* Left Column */}
+                <div>
+                    {/* Scoring Engine Breakdown */}
+                    <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb", marginBottom: "24px" }}>
+                        <h2 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "20px", color: "#111827", display: "flex", alignItems: "center", gap: "8px" }}>
+                            Engine Component Breakdown
+                        </h2>
 
-                    <ProgressBar label="Growth Score (25% weight)" value={score.components.growth} color="#3b82f6" />
-                    <ProgressBar label="Profitability Score (25% weight)" value={score.components.profitability} color="#10b981" />
-                    <ProgressBar label="Quality Score (20% weight)" value={score.components.quality} color="#f59e0b" />
-                    <ProgressBar label="Innovation Score (15% weight)" value={score.components.innovation} color="#8b5cf6" />
-                    <ProgressBar label="Scale Score (15% weight)" value={score.components.scale} color="#ec4899" />
+                        <ProgressBar label="Growth Score (25% weight)" value={score.components.growth} color="#3b82f6" />
+                        <ProgressBar label="Profitability Score (25% weight)" value={score.components.profitability} color="#10b981" />
+                        <ProgressBar label="Quality Score (20% weight)" value={score.components.quality} color="#f59e0b" />
+                        <ProgressBar label="Innovation Score (15% weight)" value={score.components.innovation} color="#8b5cf6" />
+                        <ProgressBar label="Scale Score (15% weight)" value={score.components.scale} color="#ec4899" />
+                    </div>
+
+                    {/* Company Brief Box */}
+                    <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb" }}>
+                        <h2 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#111827", display: "flex", alignItems: "center", gap: "8px" }}>
+                            Company Brief
+                        </h2>
+                        {infoLoading ? (
+                            <div style={{ color: "#64748b", fontSize: "14px" }}>Loading company details...</div>
+                        ) : companyInfo ? (
+                            <div>
+                                <p style={{ color: "#475569", fontSize: "14px", lineHeight: "1.6", margin: "0 0 12px 0", maxHeight: "150px", overflowY: "auto", paddingRight: "8px" }}>
+                                    {companyInfo.summary}
+                                </p>
+                                {companyInfo.industry && companyInfo.industry !== "Unknown" && (
+                                    <div style={{ fontSize: "13px", color: "#64748b", fontWeight: "500" }}>
+                                        Industry: {companyInfo.industry}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div style={{ color: "#9ca3af", fontSize: "14px" }}>No brief available.</div>
+                        )}
+                    </div>
                 </div>
 
                 <div>
                     {/* Health Check Panel */}
                     <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: `2px solid ${health.status === 'green' ? '#10b981' : health.status === 'yellow' ? '#f59e0b' : '#ef4444'}`, marginBottom: "24px" }}>
                         <h2 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#111827", display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span>🩺</span> Health Check Checklist
+                            Health Checklist
                         </h2>
                         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
                             {health.criteria.map((c, i) => (
@@ -125,7 +166,7 @@ function StockDetail({ companySymbol, companyData, allCompanies }) {
                     {/* Weight Calculator Panel */}
                     <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb" }}>
                         <h2 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#111827", display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span>⚖️</span> Sector Target Allocator
+                            Sector Target Allocator
                         </h2>
                         <div style={{ display: "flex", gap: "24px", marginBottom: "16px" }}>
                             <div>

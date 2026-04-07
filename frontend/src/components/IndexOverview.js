@@ -14,9 +14,7 @@ function IndexOverview() {
 
     useEffect(() => {
         // Fetch overview
-        axios.get(`${process.env.REACT_APP_API_URL}/index/overview`, {
-            headers: { 'Bypass-Tunnel-Reminder': 'true' }
-        })
+        axios.get(`${process.env.REACT_APP_API_URL}/index/overview`)
             .then(res => setOverview(res.data))
             .catch(err => {
                 console.error("Failed to fetch abstract index overview:", err);
@@ -25,9 +23,7 @@ function IndexOverview() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`${process.env.REACT_APP_API_URL}/index/history?days=${historyDays}`, {
-            headers: { 'Bypass-Tunnel-Reminder': 'true' }
-        })
+        axios.get(`${process.env.REACT_APP_API_URL}/index/history?days=${historyDays}`)
             .then(res => {
                 setHistory(res.data.history);
                 setOutperformance(res.data.outperformance);
@@ -57,7 +53,7 @@ function IndexOverview() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "32px" }}>
                 <div>
                     <h1 style={{ fontSize: "28px", fontWeight: "bold", margin: "0 0 8px 0", color: "#111827" }}>
-                        Future India Index
+                        ISTE Index
                     </h1>
                     <p style={{ color: "#6b7280", margin: 0 }}>
                         Tracking the next generation of Indian economic powerhouses.
@@ -93,7 +89,7 @@ function IndexOverview() {
                 {/* Sector Allocation Panel */}
                 <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
                     <h2 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#111827", display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span>🥧</span> Sector Allocation
+                        Sector Allocation
                     </h2>
                     <div style={{ height: "300px", position: "relative" }}>
                         {overview ? (
@@ -129,7 +125,7 @@ function IndexOverview() {
                 <div style={{ background: "white", borderRadius: "16px", padding: "24px", border: "1px solid #e5e7eb", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                         <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#111827", display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                            <span>📈</span> VS Nifty 50
+                            VS Nifty 50
                         </h2>
                         <div style={{ display: "flex", gap: "8px" }}>
                             {[7, 30, 90, 365].map(d => (
@@ -178,7 +174,7 @@ function IndexOverview() {
                                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                                     />
                                     <Legend iconType="circle" />
-                                    <Line yAxisId="left" type="monotone" dataKey="future_india" name="Future India Index" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                                    <Line yAxisId="left" type="monotone" dataKey="future_india" name="ISTE Index" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
                                     <Line yAxisId="right" type="monotone" dataKey="nifty_50" name="Nifty 50 (^NSEI)" stroke="#94a3b8" strokeWidth={2} dot={false} strokeDasharray="5 5" />
                                 </LineChart>
                             </ResponsiveContainer>

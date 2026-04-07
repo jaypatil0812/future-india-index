@@ -1,11 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://future-india-backend.loca.lt/$1"
+      "source": "/api/:path*",
+      "destination": "https://future-india-index.onrender.com/:path*/"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api).*)",
       "destination": "/index.html"
     }
   ]

@@ -2,22 +2,25 @@
 echo ===== Starting Stock Dashboard Setup =====
 
 :: Go to backend
-cd /d C:\Users\Neuro Nexus\stock-dashboard\backend
+cd /d "%~dp0backend"
 
 echo --- Seeding Database ---
+if exist venv\Scripts\activate.bat (
+    call venv\Scripts\activate.bat
+)
 python -m app.seed
 
 echo --- Starting Backend Server ---
-start cmd /k "python -m uvicorn app.main:app --reload"
+start cmd /k "if exist venv\Scripts\activate.bat (call venv\Scripts\activate.bat) & python -m uvicorn app.main:app --reload"
 
 :: Go to frontend
-cd /d C:\Users\Neuro Nexus\stock-dashboard\frontend
+cd /d "%~dp0frontend"
 
 :: Install dependencies if not installed
 if not exist "node_modules" (
     echo --- Installing Frontend Dependencies ---
-    npm install
-    npm install axios chart.js react-chartjs-2
+    call npm install
+    call npm install axios chart.js react-chartjs-2
 )
 
 echo --- Starting Frontend ---

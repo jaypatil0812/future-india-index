@@ -12,9 +12,7 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_API_URL}/companies`, {
-      headers: { 'Bypass-Tunnel-Reminder': 'true' }
-    })
+    axios.get(`${process.env.REACT_APP_API_URL}/companies`)
       .then((res) => {
         setCompanies(res.data);
         setError(null);
@@ -63,7 +61,7 @@ function App() {
       alignItems: 'center',
       justifyContent: 'center',
       color: 'white',
-      fontSize: '20px',
+      fontSize: '14px',
       fontWeight: 'bold',
       boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.4)'
     },
@@ -156,9 +154,9 @@ function App() {
       <header style={styles.header}>
         <div style={styles.headerInner}>
           <div style={styles.logo}>
-            <div style={styles.logoIcon}>🇮🇳</div>
+            <div style={styles.logoIcon}>ISTE</div>
             <div>
-              <div style={styles.logoText}>Future India Index</div>
+              <div style={styles.logoText}>ISTE Index</div>
               <div style={styles.logoSubtext}>V1.0 Advanced Index Engine</div>
             </div>
           </div>

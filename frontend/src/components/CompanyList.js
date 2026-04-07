@@ -53,7 +53,7 @@ function CompanyList({ companies, onSelect, selectedCompany }) {
           gap: "8px"
         }}
       >
-        <span>🌐</span> Future India Index Home
+        ISTE Index Home
       </button>
 
       {Object.entries(sectors).map(([sectorName, sectorCompanies]) => (
