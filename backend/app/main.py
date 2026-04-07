@@ -47,12 +47,14 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(update_index_cache, 'interval', hours=1)
     scheduler.start()
     
-    # 3. Warm the cache immediately at startup
-    print("Warming background index cache...")
+    import asyncio
+    
+    # 3. Warm the cache immediately at startup in a non-blocking thread
+    print("Scheduling background index cache warm-up...")
     try:
-        update_index_cache()
+        asyncio.create_task(asyncio.to_thread(update_index_cache))
     except Exception as e:
-        print("Failed to warm cache:", e)
+        print("Failed to schedule warm cache task:", e)
         
     yield
     
