@@ -62,7 +62,11 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
 
 
-app = FastAPI(title="Stock Market Dashboard", lifespan=lifespan)
+app = FastAPI(title="ISTE Index API", lifespan=lifespan)
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the ISTE Index API! The API is running successfully."}
 
 # ✅ Enable CORS
 origins = [
