@@ -1,0 +1,13 @@
+{
+  "outputDirectory": "frontend/build",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://future-india-index.onrender.com/:path*/"
+    },
+    {
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
